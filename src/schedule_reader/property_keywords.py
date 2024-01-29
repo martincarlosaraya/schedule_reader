@@ -10,12 +10,11 @@ def read_keyword_from_include(path, keyword=None, encoding='cp1252'):
 
     """
     with open(path, 'r') as f:
-        keyword_data = f.readlines()
+        keyword_data = ''.join(f.readlines())
     
     if keyword not in keyword_data:
         raise ValueError(f"The requested keyword {keyword} is not in this file {path}")
 
-    keyword_data = ''.join(keyword_data)
     i = keyword_data.index(keyword)
     f = keyword_data.index('/', i)
     keyword_data = keyword_data[i+len(keyword): f].strip()
@@ -38,11 +37,17 @@ def expand_keyword(string):
          for each in string.split()]
     )
 
-def ijk_index(i, j, k):
-    cells = [(i, j, k)
-             for k in range(1, dimens[2]+1)
-             for j in range(1, dimens[1]+1)
-             for i in range(1, dimens[0]+1)
+def ijk_index(i, j=None, k=None):
+    if j is None and k is None and hasattr(i, '__iter__') and len(i) == 3 \
+        and i[0] is not None and i[1] is not None and i[2] is not None:
+        i, j, k = i[0], i[1], i[2]
+    elif j is None or k is None:
+        raise ValueError(f"must provide i, j, k or a tuple of (i, j, k), but received i={i}, j={j}, k={k}")
+
+    cells = [(i_, j_, k_)
+             for k_ in range(1, k+1)
+             for j_ in range(1, j+1)
+             for i_ in range(1, i+1)
              ]
-    return pd.MultiIndex.from_tuples(cells))
+    return pd.MultiIndex.from_tuples(cells)
     
