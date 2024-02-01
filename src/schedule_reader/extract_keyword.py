@@ -1,6 +1,7 @@
 import pandas as pd
+from .dates import parse_dates
 
-def extract_keyword(schedule_dict, keyword, record_names=None): 
+def extract_keyword(schedule_dict, keyword: str=None, record_names=None): 
     """
     from the provided schedule dictionay `schedule_dict` extract the desired `keyword`, create a DataFrame and set the column names as the `record_names` provided (optional).
 
@@ -16,6 +17,13 @@ def extract_keyword(schedule_dict, keyword, record_names=None):
         pandas.DataFrame
     """
     result_table = {}
+
+    # extract only the dates, all the dates
+    if keyword == 'DATES':
+        result_table = [schedule_dict[each]['DATES'] for each in schedule_dict if 'DATES' in schedule_dict[each]]
+        return pd.Series(parse_dates(result_table), name='DATES')
+
+    # look for especified keyword, only keep the last previous date
     for each in schedule_dict:
         if 'DATES' in schedule_dict[each]:
             date = schedule_dict[each]['DATES']
