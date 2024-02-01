@@ -55,18 +55,20 @@ def read_data(filepath:str, *, paths: dict={}, folder: str=None, encoding: str='
         verbose = True
     else:
         verbose = bool(verbose)
-    
-    # initialize the counter
-    if counter is None:
-        counter = Counter()
-    print(f"{str(counter)} keywords until now")
 
     # read and clean the main file
     if verbose:
-        print('reading file:', filepath)
+        print('Reading the file:', filepath)
     with open(filepath, 'r', encoding=encoding) as f:
         datafile = f.readlines()
     datafile = [line.strip() for line in datafile]
+
+    # initialize the counter
+    if counter is None:
+        counter = Counter()
+    if verbose:
+        keywords_before = counter.curr()
+        print(f"{counter.curr()} keywords found until now")
 
     # initialize start_date variable, will be populated if START keyword is found
     start_date, found_START = None, False
@@ -248,6 +250,8 @@ def read_data(filepath:str, *, paths: dict={}, folder: str=None, encoding: str='
             if verbose:
                 print(f"found {keyword_} keyword")
             line += 1
+            while _empty_line() or _comment_line():
+                line += 1
             extracted[counter()] = {keyword_: datafile[line].split()[0].upper()}
             line += 1
         elif datafile[line].split()[0].upper() in skip3_keywords:
@@ -256,6 +260,8 @@ def read_data(filepath:str, *, paths: dict={}, folder: str=None, encoding: str='
                 print(f"found {keyword_} keyword")
             line += 1
             for i in range(3):
+                while _empty_line() or _comment_line():
+                    line += 1
                 extracted[counter()] = {keyword_: datafile[line].split()[0].upper()}
                 line += 1
 
@@ -282,7 +288,8 @@ def read_data(filepath:str, *, paths: dict={}, folder: str=None, encoding: str='
         else:
             line += 1
 
-        if verbose:
-            print(f"closing this file, {str(counter)} keywords until now")
+
+    if verbose:
+        print(f"closing this file, {counter.curr() - keywords_before} keywords found here.")
 
     return extracted
