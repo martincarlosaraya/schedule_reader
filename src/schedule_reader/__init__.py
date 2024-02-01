@@ -3,8 +3,9 @@ from .data_reader import read_data
 from .welspecs import extract_welspecs
 from .compdat import extract_compdat
 from .property_keywords import read_keyword_from_include, expand_keyword, ijk_index
+from .counter import start_counter
 
-__all__ = ['compdat2df', 'welspecs2df', 'property2df']
+__all__ = ['compdat2df', 'welspecs2df', 'property2df', 'start_counter']
 
 
 def compdat2df(path, encoding='cp1252', verbose=False):

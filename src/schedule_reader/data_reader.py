@@ -25,7 +25,7 @@ def read_data(filepath:str, *, paths: dict={}, folder: str=None, encoding: str='
             {i: {keyword: [records]}}
     """
     def _keyword_end():
-        return datafile[line].split()[0] == '/'
+        return datafile[line].strip().startswith('/')
     def _comment_line():
         return datafile[line].strip().startswith('--')
     def _empty_line():
