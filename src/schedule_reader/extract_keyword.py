@@ -28,7 +28,9 @@ def extract_keyword(schedule_dict, keyword: str=None, record_names=None):
         if 'DATES' in schedule_dict[each]:
             date = schedule_dict[each]['DATES']
         elif keyword in schedule_dict[each]:
-            result_table[each] = [date] + schedule_dict[each][keyword]
+            result_table[each] = [date] + (schedule_dict[each][keyword] 
+                                           if type(schedule_dict[each][keyword]) is list 
+                                           else [schedule_dict[each][keyword]])
     if record_names is None:
         return pd.DataFrame(data=result_table).transpose().dropna(axis=0, how='all')
     else:
