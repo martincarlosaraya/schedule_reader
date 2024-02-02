@@ -182,6 +182,7 @@ def read_data(filepath:str, *, encoding: str='cp1252', verbose: bool=False,
         # if COMPDAT is found
         elif datafile[line].upper().startswith('COMPDAT'):
             line += 1
+            key_columns = 14
             if verbose:
                 print("found COMPDAT keyword")
                 _counter0 = counter.curr() + 1
@@ -200,14 +201,14 @@ def read_data(filepath:str, *, encoding: str='cp1252', verbose: bool=False,
                 line += 1
 
                 # complete default values at the end if requered
-                if len(compdat_line) < 14:
+                if len(compdat_line) < key_columns:
                     compdat_line_expanded = []
                     for each in compdat_line:
                         if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
                             compdat_line_expanded = compdat_line_expanded + (['1*'] * int(each[:-1]))
                         else:
                             compdat_line_expanded.append(each)
-                    compdat_line_expanded = compdat_line_expanded + (['1*'] * (14 - len(compdat_line_expanded)))
+                    compdat_line_expanded = compdat_line_expanded + (['1*'] * (key_columns - len(compdat_line_expanded)))
                     compdat_line = compdat_line_expanded
                 extracted[counter()] = {'COMPDAT': compdat_line}
 
@@ -216,9 +217,48 @@ def read_data(filepath:str, *, encoding: str='cp1252', verbose: bool=False,
                 print(f" for wells: {', '.join(set([extracted[i_]['COMPDAT'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
 
 
+        # if COMPDATL or COMPDATM is found
+        elif datafile[line].upper().startswith('COMPDATL') or datafile[line].upper().startswith('COMPDATM'):
+            line += 1
+            key_columns = 15
+            if verbose:
+                print("found COMPDATL keyword")
+                _counter0 = counter.curr() + 1
+
+            # read all the COMPDATL lines until the closing /
+            while not _keyword_end():
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword COMPDATL in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                compdatl_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(compdatl_line) < key_columns:
+                    compdatl_line_expanded = []
+                    for each in compdatl_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            compdatl_line_expanded = compdatl_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            compdatl_line_expanded.append(each)
+                    compdatl_line_expanded = compdatl_line_expanded + (['1*'] * (key_columns - len(compdatl_line_expanded)))
+                    compdatl_line = compdatl_line_expanded
+                extracted[counter()] = {'COMPDATL': compdatl_line}
+
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['COMPDATL'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+    
         # if WELSPECS is found
         elif datafile[line].upper().startswith('WELSPECS'):
             line += 1
+            key_columns = 17
             if verbose:
                 print("found WELSPECS keyword")
                 _counter0 = counter.curr() + 1
@@ -237,20 +277,248 @@ def read_data(filepath:str, *, encoding: str='cp1252', verbose: bool=False,
                 line += 1
 
                 # complete default values at the end if requered
-                if len(welspecs_line) < 17:
+                if len(welspecs_line) < key_columns:
                     welspecs_line_expanded = []
                     for each in welspecs_line:
                         if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
                             welspecs_line_expanded = welspecs_line_expanded + (['1*'] * int(each[:-1]))
                         else:
                             welspecs_line_expanded.append(each)
-                    welspecs_line_expanded = welspecs_line_expanded + (['1*'] * (17 - len(welspecs_line_expanded)))
+                    welspecs_line_expanded = welspecs_line_expanded + (['1*'] * (key_columns - len(welspecs_line_expanded)))
                     welspecs_line = welspecs_line_expanded
                 extracted[counter()] = {'WELSPECS': welspecs_line}
                 
             line += 1  # keyword end line
             if verbose:
                 print(f" for wells: {', '.join(set([extracted[i_]['WELSPECS'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+
+        # if WELSPECL is found
+        elif datafile[line].upper().startswith('WELSPECL'):
+            line += 1
+            key_columns = 18
+            if verbose:
+                print("found WELSPECL keyword")
+                _counter0 = counter.curr() + 1
+
+            while not _keyword_end():
+
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword WELSPECL in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                welspecl_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(welspecl_line) < key_columns:
+                    welspecl_line_expanded = []
+                    for each in welspecs_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            welspecl_line_expanded = welspecl_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            welspecl_line_expanded.append(each)
+                    welspecl_line_expanded = welspecl_line_expanded + (['1*'] * (key_columns - len(welspecl_line_expanded)))
+                    welspecl_line = welspecl_line_expanded
+                extracted[counter()] = {'WELSPECL': welspecl_line}
+                
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['WELSPECL'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+
+        # if WELLSPEC is found
+        elif datafile[line].upper().startswith('WELLSPEC'):
+            line += 1
+            key_columns = 7
+            if verbose:
+                print("found WELLSPEC keyword")
+                _counter0 = counter.curr() + 1
+
+            while not _keyword_end():
+
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword WELLSPEC in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                wellspec_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(wellspec_line) < key_columns:
+                    wellspec_line_expanded = []
+                    for each in welspecs_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            wellspec_line_expanded = wellspec_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            wellspec_line_expanded.append(each)
+                    wellspec_line_expanded = wellspec_line_expanded + (['1*'] * (key_columns - len(wellspec_line_expanded)))
+                    wellspec_line = wellspec_line_expanded
+                extracted[counter()] = {'WELLSPEC': wellspec_line}
+                
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['WELLSPEC'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+
+        # if WCONPROD is found
+        elif datafile[line].upper().startswith('WCONPROD'):
+            line += 1
+            key_columns = 20
+            if verbose:
+                print("found WCONPROD keyword")
+                _counter0 = counter.curr() + 1
+
+            while not _keyword_end():
+
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword WCONPROD in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                wconprod_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(wconprod_line) < key_columns:
+                    wconprod_line_expanded = []
+                    for each in wconprod_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            wconprod_line_expanded = wconprod_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            wconprod_line_expanded.append(each)
+                    wconprod_line_expanded = wconprod_line_expanded + (['1*'] * (key_columns - len(wconprod_line_expanded)))
+                    wconprod_line = wconprod_line_expanded
+                extracted[counter()] = {'WCONPROD': wconprod_line}
+                
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['WCONPROD'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+
+        # if WCONHIST is found
+        elif datafile[line].upper().startswith('WCONHIST'):
+            line += 1
+            key_columns = 12
+            if verbose:
+                print("found WCONHIST keyword")
+                _counter0 = counter.curr() + 1
+
+            while not _keyword_end():
+
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword WCONHIST in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                wconhist_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(wconhist_line) < key_columns:
+                    wconhist_line_expanded = []
+                    for each in wconhist_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            wconhist_line_expanded = wconhist_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            wconhist_line_expanded.append(each)
+                    wconhist_line_expanded = wconhist_line_expanded + (['1*'] * (key_columns - len(wconhist_line_expanded)))
+                    wconhist_line = wconhist_line_expanded
+                extracted[counter()] = {'WCONHIST': wconhist_line}
+                
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['WCONHIST'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+
+        # if WCONINJE is found
+        elif datafile[line].upper().startswith('WCONINJE'):
+            line += 1
+            key_columns = 15
+            if verbose:
+                print("found WCONINJE keyword")
+                _counter0 = counter.curr() + 1
+
+            while not _keyword_end():
+
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword WCONINJE in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                wconinje_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(wconinje_line) < key_columns:
+                    wconinje_line_expanded = []
+                    for each in wconinje_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            wconinje_line_expanded = wconinje_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            wconinje_line_expanded.append(each)
+                    wconinje_line_expanded = wconinje_line_expanded + (['1*'] * (key_columns - len(wconinje_line_expanded)))
+                    wconinje_line = wconinje_line_expanded
+                extracted[counter()] = {'WCONINJE': wconinje_line}
+                
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['WCONINJE'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
+
+
+        # if WCONINJH is found
+        elif datafile[line].upper().startswith('WCONINJH'):
+            line += 1
+            key_columns = 12
+            if verbose:
+                print("found WCONINJH keyword")
+                _counter0 = counter.curr() + 1
+
+            while not _keyword_end():
+
+                # skip empty or commented lines
+                if _empty_line() or _comment_line():
+                    line += 1
+                    continue
+
+                if '/' not in datafile[line]:
+                    raise ValueError(f"Error format in keyword WCONINJH in line {line + 1} in file {filepath}. Missing / at the end of the line.")
+                
+                wconinjh_line = _line_data().split()
+                line += 1
+
+                # complete default values at the end if requered
+                if len(wconinjh_line) < key_columns:
+                    wconinjh_line_expanded = []
+                    for each in wconinjh_line:
+                        if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                            wconinjh_line_expanded = wconinjh_line_expanded + (['1*'] * int(each[:-1]))
+                        else:
+                            wconinjh_line_expanded.append(each)
+                    wconinjh_line_expanded = wconinjh_line_expanded + (['1*'] * (key_columns - len(wconinjh_line_expanded)))
+                    wconinjh_line = wconinjh_line_expanded
+                extracted[counter()] = {'WCONINJH': wconinjh_line}
+                
+            line += 1  # keyword end line
+            if verbose:
+                print(f" for wells: {', '.join(set([extracted[i_]['WCONINJH'][0] for i_ in range(_counter0, counter.curr()+1)]))}")
 
 
         # if INCLUDE is found, will read the include
@@ -328,9 +596,28 @@ def read_data(filepath:str, *, encoding: str='cp1252', verbose: bool=False,
                     continue
 
                 keyword_line = _line_data().split()
+
+                # expand default values if needed
+                keyword_line_expanded = []
+                for each in keyword_line:
+                    if len(each) >= 2 and each.endswith('*') and each[:-1].isdigit():
+                        keyword_line_expanded = keyword_line_expanded + (['1*'] * int(each[:-1]))
+                    else:
+                        keyword_line_expanded.append(each)
+                keyword_line = keyword_line_expanded
                 extracted[counter()] = {keyword_: keyword_line}
                 line += 1
             line += 1
+
+            # expand default values at the end if needed
+            keyword_max_ = [len(extracted[i_][keyword_]) for i_ in range(_counter0, counter.curr()+1)]
+            if len(keyword_max_) > 0:
+                keyword_max_ = max([len(extracted[i_][keyword_]) for i_ in range(_counter0, counter.curr()+1)])
+                for each in range(_counter0, counter.curr()+1):
+                    keyword_line = extracted[each][keyword_] 
+                    if len(keyword_line) < keyword_max_:
+                        extracted[each][keyword_] = keyword_line + (['1*'] * (keyword_max_ - len(keyword_line)))           
+
             if verbose:
                 print(f" for: {', '.join(set([extracted[i_][keyword_][0] for i_ in range(_counter0, counter.curr()+1)]))}")
 
