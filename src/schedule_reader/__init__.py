@@ -8,7 +8,7 @@ from .schedule_keywords import extract_keyword
 from .counter import start_counter
 
 __all__ = ['compdat2df', 'welspecs2df', 'property2df', 'start_counter']
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
 def compdat2df(path, encoding='cp1252', verbose=False):
@@ -43,8 +43,8 @@ def wconinjh2df(path, encoding='cp1252', verbose=False):
 
 def keyword2df(path, keyword, record_names=[], encoding='cp1252', verbose=True):
     if type(path) is dict:
-        return schedule_keywords(path, keyword=keyword, record_names=record_names)
-    return schedule_keywords(
+        return extract_keyword(path, keyword=keyword, record_names=record_names)
+    return extract_keyword(
         read_data(path, encoding=encoding, verbose=verbose),
         keyword=keyword, record_names=record_names
     )
