@@ -1,1 +1,8 @@
 pdm_token_cache.bin
+src/schedule_reader/__pycache__/__init__.cpython-310.pyc
+src/schedule_reader/__pycache__/compdat_reader.cpython-310.pyc
+src/schedule_reader/__pycache__/compdat.cpython-310.pyc
+src/schedule_reader/__pycache__/data_reader.cpython-310.pyc
+src/schedule_reader/__pycache__/dates.cpython-310.pyc
+src/schedule_reader/__pycache__/extract_keyword.cpython-310.pyc
+src/schedule_reader/__pycache__/welspecs.cpython-310.pyc
