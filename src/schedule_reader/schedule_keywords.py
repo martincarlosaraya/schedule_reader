@@ -32,6 +32,12 @@ def extract_keyword(schedule_dict, keyword: str=None, record_names=None):
             result_table[each] = [date] + (schedule_dict[each][keyword] 
                                            if type(schedule_dict[each][keyword]) is list 
                                            else [schedule_dict[each][keyword]])
+    
+    _len = [len(result_table[each]) for each in result_table]
+    if len(_len) > 0 and max(_len) != min(_len):
+        _len = max(_len)
+        result_table = {each: result_table[each] + (['1*'] * (_len - len(result_table[each]))) for each in result_table}
+
     if record_names is not None:
         result = pd.DataFrame(data=result_table).transpose()
         if len(result.columns) == 0:
@@ -44,8 +50,7 @@ def extract_keyword(schedule_dict, keyword: str=None, record_names=None):
             result = pd.DataFrame(data=result_table).transpose()
             result.columns = record_names[:len(result.columns)]
     else:
-        result = pd.DataFrame(data=result_table).transpose().dropna(axis=0, how='all')
-    
+        result = pd.DataFrame(data=result_table).transpose()
     
     result[result.select_dtypes(object).columns] = result.select_dtypes(object)\
         .apply(lambda col : col.str.strip(""""'" """))\
