@@ -584,9 +584,9 @@ def read_data(filepath:str, *, encoding: str='cp1252', verbose: bool=False,
         elif _keyword()[0] in 'CWGU':
             keyword_ = _keyword()
             line += 1
+            _counter0 = counter.curr() + 1
             if verbose:
                 print(f"found {keyword_} keyword")
-                _counter0 = counter.curr() + 1
 
             while not _keyword_end():
 
