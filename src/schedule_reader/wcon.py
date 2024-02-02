@@ -27,6 +27,10 @@ def extract_wconprod(schedule_dict):
         wconprod_table['well'] = wconprod_table['well'].astype('category')
         wconprod_table.replace('1*', np.nan, inplace=True)
         wconprod_table.replace("'1*'", np.nan, inplace=True)
+        wconprod_table.loc[:, 'status'].fillna('OPEN', inplace=True)
+        wconprod_table.loc[:, 'control mode'].fillna('', inplace=True)
+        wconprod_table.loc[:, 'status'].fillna('OPEN', inplace=True)
+        wconprod_table.loc[:, 'ALQ'].fillna(0, inplace=True)
     return wconprod_table
 
 
@@ -51,6 +55,9 @@ def extract_wconinje(schedule_dict):
         wconinje_table['well'] = wconinje_table['well'].astype('category')
         wconinje_table.replace('1*', np.nan, inplace=True)
         wconinje_table.replace("'1*'", np.nan, inplace=True)
+        wconinje_table.loc[:, 'status'].fillna('OPEN', inplace=True)
+        wconinje_table.loc[:, ['vap oil concentration', 'thermal ratio of gas to steam', 
+                               'OIL proportion', 'WATER proportion', 'GAS proportion', 'ratio of oil oil to steam']].fillna(0, inplace=True)
     return wconinje_table
 
 
@@ -75,6 +82,9 @@ def extract_wconhist(schedule_dict):
         wconhist_table['well'] = wconhist_table['well'].astype('category')
         wconhist_table.replace('1*', np.nan, inplace=True)
         wconhist_table.replace("'1*'", np.nan, inplace=True)
+        wconhist_table.loc[:, ['status']].fillna('OPEN', inplace=True)
+        wconhist_table.loc[:, ['OIL rate', 'WATER rate', 'GAS rate', 'THP limit', 'BHP limit', 'wet gas rate', 'NGL rate']].fillna(0, inplace=True)
+        wconhist_table.loc[:, ['VFP']].fillna(method='ffill', inplace=True)
     return wconhist_table
 
 
@@ -99,4 +109,8 @@ def extract_wconinjh(schedule_dict):
         wconinjh_table['well'] = wconinjh_table['well'].astype('category')
         wconinjh_table.replace('1*', np.nan, inplace=True)
         wconinjh_table.replace("'1*'", np.nan, inplace=True)
+        wconinjh_table.loc[:, ['status']].fillna('OPEN', inplace=True)
+        wconinjh_table.loc[:, ['injection rate', 'BHP', 'THP', 'vap oil concentration', 'OIL proportion', 'WATER proportion', 'GAS proportion',]].fillna(0, inplace=True)
+        wconinjh_table.loc[:, ['VFP']].fillna(method='ffill', inplace=True)
+        wconinjh_table.loc[:, ['control model']].fillna('RATE', inplace=True)
     return wconinjh_table
