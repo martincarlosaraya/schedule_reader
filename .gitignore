@@ -1,4 +1,5 @@
 pdm_token_cache.bin
 *.pyc
 src/schedule_reader/__pycache__/
-
+src/schedule_reader/__pycache__/*.pyc
+src/schedule_reader.zip
