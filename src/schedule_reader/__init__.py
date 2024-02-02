@@ -8,7 +8,7 @@ from .schedule_keywords import extract_keyword
 from .counter import start_counter
 
 __all__ = ['compdat2df', 'welspecs2df', 'property2df', 'start_counter']
-__version__ = '0.6.0'
+__version__ = '0.6.5'
 
 
 def compdat2df(path, encoding='cp1252', verbose=False):
@@ -41,7 +41,8 @@ def wconinjh2df(path, encoding='cp1252', verbose=False):
         return extract_wconinjh(path)
     return extract_wconinjh(read_data(path, encoding=encoding, verbose=verbose))
 
-def keyword2df(path, keyword, record_names=[], encoding='cp1252', verbose=True):
+def keyword2df(path, keyword, record_names=[], encoding='cp1252', verbose=False):
+    record_names = None if len(record_names) == 0 else record_names
     if type(path) is dict:
         return extract_keyword(path, keyword=keyword, record_names=record_names)
     return extract_keyword(
@@ -50,7 +51,7 @@ def keyword2df(path, keyword, record_names=[], encoding='cp1252', verbose=True):
     )
 
 def property2df(path, keyword, dimens=(None, None, None), encoding='cp1252', verbose=False, parse_to=None):
-    keyword_data = expand_keyword(read_keyword_from_include(path, keyword, encoding='cp1252'))
+    keyword_data = expand_keyword(read_keyword_from_include(path, keyword, encoding=encoding))
     if dimens[0] is not None and dimens[1] is not None and dimens[2] is not None:
         cells = ijk_index(dimens[0], dimens[1], dimens[2])
         output = pd.Series(
@@ -60,7 +61,7 @@ def property2df(path, keyword, dimens=(None, None, None), encoding='cp1252', ver
         output.columns = ['I', 'J', 'K', keyword]
         output[['I', 'J', 'K']] = output[['I', 'J', 'K']].astype(int)
         if parse_to is None:
-            pars_to = int if keyword.endswith('NUM') else float
+            parse_to = int if keyword.endswith('NUM') else float
         output[keyword] = output[keyword].astype(parse_to)
         return output
     else:
