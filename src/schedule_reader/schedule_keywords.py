@@ -51,5 +51,5 @@ def extract_keyword(schedule_dict, keyword: str=None, record_names=None):
         .apply(lambda col : col.str.strip(""""'" """))\
         .replace('1*', np.nan)\
         .convert_dtypes(infer_objects=True, convert_string=False, 
-                        convert_integer=True, convert_boolean=True, convert_floating=True, dtype_backend='numpy_nullable')
+                        convert_integer=True, convert_boolean=True, convert_floating=True)  # dtype_backend='numpy_nullable'
     return result
