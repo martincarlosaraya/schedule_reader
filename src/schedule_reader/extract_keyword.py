@@ -32,8 +32,16 @@ def extract_keyword(schedule_dict, keyword: str=None, record_names=None):
                                            if type(schedule_dict[each][keyword]) is list 
                                            else [schedule_dict[each][keyword]])
     if record_names is None:
-        return pd.DataFrame(data=result_table).transpose().dropna(axis=0, how='all')
+        try:
+            return pd.DataFrame(data=result_table).transpose().dropna(axis=0, how='all')
+        except:
+            print("Failed to create DataFrame, a dictionary returned instead. please check data consistency.")
+            return result_table
     else:
-        result = pd.DataFrame(data=result_table).transpose().iloc[:, :len(record_names)]
-        result.columns = record_names
-        return result
+        try:
+            result = pd.DataFrame(data=result_table).transpose().iloc[:, :len(record_names)]
+            result.columns = record_names
+            return result
+        except:
+            print("Failed to create DataFrame, a dictionary returned instead. please check data consistency.")
+            return result_table
