@@ -1,6 +1,6 @@
 import pandas as pd
 
-__all__ = ['read_keyword_from_include', 'expand_keyword', 'ijk_index']
+__all__ = ['read_keyword_from_include', 'expand_keyword', 'ijk_index', 'get_dimens']
 
 def read_keyword_from_include(path, keyword=None, encoding='cp1252'):
     """
@@ -50,4 +50,21 @@ def ijk_index(i, j=None, k=None):
              for i_ in range(1, i+1)
              ]
     return pd.MultiIndex.from_tuples(cells)
+
+def get_dimens(path, encoding='cp1252'):
+    """
+    reads the ASCII .DATA file and returns a three items tuple with the DIMENS keyword data.
+    """
+    with open(path, 'r') as f:
+        keyword_data = ''.join(f.readlines())
+    
+    keyword = 'DIMENS'
+    if keyword not in keyword_data:
+        return (None, None, None)
+    
+    i = keyword_data.index(keyword)    
+    f = keyword_data.index('/', i)
+    keyword_data = keyword_data[i+len(keyword): f].strip()
+
+    return tuple(keyword_data.split())
     

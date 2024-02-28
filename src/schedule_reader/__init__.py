@@ -3,7 +3,7 @@ from .data_reader import read_data
 from .welspec import extract_welspecs, extract_welspecl, extract_wellspec, extract_welspec2
 from .compdat import extract_compdat, extract_compdatl, extract_compdat2
 from .wcon import extract_wconprod, extract_wconinje, extract_wconhist, extract_wconinjh
-from .property_keywords import read_keyword_from_include, expand_keyword, ijk_index
+from .property_keywords import read_keyword_from_include, expand_keyword, ijk_index, get_dimens
 from .schedule_keywords import extract_keyword
 from .counter import start_counter
 
@@ -50,7 +50,7 @@ def keyword2df(path, keyword, record_names=[], encoding='cp1252', verbose=False)
         keyword=keyword, record_names=record_names
     )
 
-def property2df(path, keyword, dimens=(None, None, None), encoding='cp1252', verbose=False, parse_to=None):
+def property2df(path, keyword, dimens=(None, None, None), encoding='cp1252', verbose=False, parse_to=None):       
     keyword_data = expand_keyword(read_keyword_from_include(path, keyword, encoding=encoding))
     if dimens[0] is not None and dimens[1] is not None and dimens[2] is not None:
         cells = ijk_index(dimens[0], dimens[1], dimens[2])
