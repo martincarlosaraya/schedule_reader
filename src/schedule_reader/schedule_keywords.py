@@ -39,18 +39,23 @@ def extract_keyword(schedule_dict, keyword: str=None, record_names=None):
         result_table = {each: result_table[each] + (['1*'] * (_len - len(result_table[each]))) for each in result_table}
 
     if record_names is not None:
+        if len(record_names) > 0 and not str(record_names[0]).lower().startswith('date'):
+            record_names = ['date'] + record_names
         result = pd.DataFrame(data=result_table).transpose()
         if len(result.columns) == 0:
             pass
         elif len(result.columns) >= len(record_names):
-            result = result.iloc[:, :len(record_names)]
+            record_names = record_names + [i for i in range(len(record_names), len(result.columns))]
             result.columns = record_names
-        elif len(result_table.index) < len(record_names):
+        elif len(result.columns) < len(record_names):
             print(f"The last {len(record_names) - len(result.columns)} records were not present in the dataset.")
             result = pd.DataFrame(data=result_table).transpose()
             result.columns = record_names[:len(result.columns)]
+            result.loc[:, record_names[len(result.columns):]] = None
     else:
         result = pd.DataFrame(data=result_table).transpose()
+        record_names = ['date'] + [i for i in range(1, len(result.columns))]
+        result.columns = record_names
     
     result[result.select_dtypes(object).columns] = result.select_dtypes(object)\
         .apply(lambda col : col.str.strip(""""'" """))\
